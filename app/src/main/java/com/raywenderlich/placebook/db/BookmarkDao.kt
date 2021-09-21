@@ -5,7 +5,6 @@ import androidx.room.*
 import androidx.room.OnConflictStrategy.IGNORE
 import androidx.room.OnConflictStrategy.REPLACE
 import com.raywenderlich.placebook.model.Bookmark
-import java.nio.charset.CodingErrorAction.REPLACE
 
 @Dao
 interface BookmarkDao {
