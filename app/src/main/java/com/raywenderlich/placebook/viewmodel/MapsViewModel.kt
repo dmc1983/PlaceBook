@@ -13,17 +13,15 @@ import com.raywenderlich.placebook.repository.BookmarkRepo
 
 class MapsViewModel(application: Application) :
     AndroidViewModel(application) {
+
     private val TAG = "MapsViewModel"
-    private var bookmarks: LiveData<List<BookmarkMarkerView>>? =
-        null
+    private var bookmarks: LiveData<List<BookmarkMarkerView>>? = null
+    private val bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
 
-    private val bookmarkRepo: BookmarkRepo = BookmarkRepo(
-        getApplication())
 
-    fun addBookmarkFromPlace(place: Place?, image: Bitmap?) {
+    fun addBookmarkFromPlace(place: Place, image: Bitmap?) {
 
         val bookmark = bookmarkRepo.createBookmark()
-
         bookmark.placeId = place.id
         bookmark.name = place.name.toString()
         bookmark.longitude = place.latLng?.longitude ?: 0.0
@@ -34,21 +32,9 @@ class MapsViewModel(application: Application) :
         val newId = bookmarkRepo.addBookmark(bookmark)
         Log.i(TAG, "New bookmark $newId added to the database.")
     }
-    private fun bookmarkToMarkerView(bookmark: Bookmark) =
-        BookmarkMarkerView(
-            bookmark.id,
-            LatLng(bookmark.latitude, bookmark.longitude))
 
-    private fun mapBookmarksToMarkerView() {
-        // 1
-        bookmarks = Transformations.map(bookmarkRepo.allBookmarks)
-        { repoBookmarks ->
-            // 2
-            repoBookmarks.map { bookmark ->
-                bookmarkToMarkerView(bookmark)
-            }
-        }
-    }
+
+
     fun getBookmarkMarkerViews() :
             LiveData<List<BookmarkMarkerView>>? {
         if (bookmarks == null) {
@@ -56,6 +42,20 @@ class MapsViewModel(application: Application) :
         }
         return bookmarks
     }
+    private fun mapBookmarksToMarkerView() {
+
+        bookmarks = Transformations.map(bookmarkRepo.allBookmarks)
+        { repoBookmarks ->
+
+            repoBookmarks.map { bookmark ->
+                bookmarkToMarkerView(bookmark)
+            }
+        }
+    }
+    private fun bookmarkToMarkerView(bookmark: Bookmark) =
+        BookmarkMarkerView(
+            bookmark.id,
+            LatLng(bookmark.latitude, bookmark.longitude))
 
     data class BookmarkMarkerView(
         var id: Long? = null,
