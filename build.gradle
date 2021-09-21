@@ -2,9 +2,10 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.4.30'
-    maps_services_version = '17.0.0'
-    location_services_version = '18.0.0'
+    kotlin_version = '1.4.21'
+    play_services_version = '17.1.0'
+    maps_version = '17.0.0'
+    places_version = '2.4.0'
     lifecycle_version = '2.2.0'
     room_version = '2.2.6'
     coroutines_version = '1.4.2'
@@ -15,7 +16,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.2'
+    classpath 'com.android.tools.build:gradle:4.1.1'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     // NOTE: Do not place your application dependencies here; they belong
@@ -23,7 +24,12 @@ buildscript {
   }
 }
 
-
+allprojects {
+  repositories {
+    google()
+    jcenter()
+  }
+}
 
 task clean(type: Delete) {
   delete rootProject.buildDir
