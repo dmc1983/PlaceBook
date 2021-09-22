@@ -1,6 +1,7 @@
 package com.raywenderlich.placebook.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
@@ -140,8 +141,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .position(place.latLng as LatLng)
             .title(place.name)
             .snippet(place.phoneNumber)
+
         )
         marker?.tag = PlaceInfo(place, photo)
+        marker?.showInfoWindow()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
@@ -197,28 +200,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val image: Bitmap? = null)
 
     private fun handleInfoWindowClick(marker: Marker) {
-        val placeInfo = (marker.tag as PlaceInfo)
-
-        if (placeInfo.place != null){
-    GlobalScope.launch {
-        mapsViewModel.addBookmarkFromPlace(placeInfo.place,placeInfo.image)
-    }
-
-}
-
-
-        marker.remove()
+        when (marker.tag) {
+            is PlaceInfo -> {
+                val placeInfo = (marker.tag as PlaceInfo)
+                if (placeInfo.place != null && placeInfo.image != null) {
+                    GlobalScope.launch {
+                        mapsViewModel.addBookmarkFromPlace(placeInfo.place,
+                            placeInfo.image)
+                    }
+                }
+                marker.remove();
+            }
+            is MapsViewModel.BookmarkMarkerView -> {
+                val bookmarkMarkerView = (marker.tag as
+                        MapsViewModel.BookmarkMarkerView)
+                marker.hideInfoWindow()
+                bookmarkMarkerView.id?.let {
+                    startBookmarkDetails(it)
+                }
+            }
+        }
     }
 
     private fun addPlaceMarker(
         bookmark: MapsViewModel.BookmarkMarkerView): Marker? {
         val marker = map.addMarker(MarkerOptions()
             .position(bookmark.location)
-            .icon(
-                BitmapDescriptorFactory.defaultMarker(
+            .title(bookmark.name)
+            .snippet(bookmark.phone)
+            .icon(BitmapDescriptorFactory.defaultMarker(
                 BitmapDescriptorFactory.HUE_AZURE))
             .alpha(0.8f))
-        marker.tag = bookmark
         return marker
     }
     private fun displayAllBookmarks(
@@ -229,13 +241,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // 1
         mapsViewModel.getBookmarkMarkerViews()?.observe(
             this, {
-                // 2
+
                 map.clear()
-                // 3
+
                 it?.let {
                     displayAllBookmarks(it)
                 }
             })
+    }
+    private fun startBookmarkDetails(bookmarkId: Long) {
+        val intent = Intent(this, BookmarkDetailsActivity::class.java)
+        startActivity(intent)
     }
 
 

@@ -30,6 +30,7 @@ android {
   }
   buildFeatures {
     viewBinding true
+    dataBinding true
   }
 }
 
@@ -44,13 +45,13 @@ dependencies {
   implementation "com.google.android.gms:play-services-maps:$maps_version"
   implementation "com.google.android.gms:play-services-location:$play_services_version"
   implementation "com.google.android.libraries.places:places:$places_version"
-
   implementation "androidx.activity:activity-ktx:1.1.0"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-
   implementation "androidx.room:room-runtime:$room_version"
   kapt "androidx.room:room-compiler:$room_version"
-
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+  implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+  implementation 'com.google.android.material:material:1.2.1'
+
 }
