@@ -6,9 +6,10 @@ import com.raywenderlich.placebook.db.BookmarkDao
 import com.raywenderlich.placebook.db.PlaceBookDatabase
 import com.raywenderlich.placebook.model.Bookmark
 
-class BookmarkRepo(context: Context) {
+class BookmarkRepo(private val context: Context) {
     private val db = PlaceBookDatabase.getInstance(context)
     private val bookmarkDao: BookmarkDao = db.bookmarkDao()
+
 
     fun addBookmark(bookmark: Bookmark): Long? {
         val newId = bookmarkDao.insertBookmark(bookmark)
@@ -24,4 +25,20 @@ class BookmarkRepo(context: Context) {
         get() {
             return bookmarkDao.loadAll()
         }
+
+
+    fun updateBookmark(bookmark: Bookmark) {
+        bookmarkDao.updateBookmark(bookmark)
+    }
+
+    fun getBookmark(bookmarkId: Long): Bookmark {
+        return bookmarkDao.loadBookmark(bookmarkId)
+    }
+
+
+    fun getLiveBookmark(bookmarkId: Long): LiveData<Bookmark> =
+        bookmarkDao.loadLiveBookmark(bookmarkId)
+
+
+
 }
