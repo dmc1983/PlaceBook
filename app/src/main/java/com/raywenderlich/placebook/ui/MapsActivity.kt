@@ -65,11 +65,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
         map.setOnPoiClickListener {
             displayPoi(it)
-            map.setOnInfoWindowClickListener {
-                handleInfoWindowClick(it)
-
-
-            }
+        }
+        map.setOnInfoWindowClickListener {
+            handleInfoWindowClick(it)
         }
     }
 
@@ -239,6 +237,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .icon(BitmapDescriptorFactory.defaultMarker(
                 BitmapDescriptorFactory.HUE_AZURE))
             .alpha(0.8f))
+        marker.tag = bookmark
         return marker
     }
     private fun displayAllBookmarks(
