@@ -17,7 +17,7 @@ class MapsViewModel(application: Application) :
     AndroidViewModel(application) {
 
     private val TAG = "MapsViewModel"
-    private var bookmarks: LiveData<List<BookmarkMarkerView>>? = null
+    private var bookmarks: LiveData<List<BookmarkView>>? = null
     private val bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
 
 
@@ -37,8 +37,8 @@ class MapsViewModel(application: Application) :
     }
 
 
-    fun getBookmarkMarkerViews():
-            LiveData<List<BookmarkMarkerView>>? {
+    fun getBookmarkMarkerView():
+            LiveData<List<BookmarkView>>? {
         if (bookmarks == null) {
             mapBookmarksToMarkerView()
         }
@@ -57,14 +57,14 @@ class MapsViewModel(application: Application) :
     }
 
     private fun bookmarkToMarkerView(bookmark: Bookmark) =
-        BookmarkMarkerView(
+        BookmarkView(
             bookmark.id,
             LatLng(bookmark.latitude, bookmark.longitude),
             bookmark.name,
             bookmark.phone
         )
 
-    data class BookmarkMarkerView(
+    data class BookmarkView(
         var id: Long? = null,
         var location: LatLng = LatLng(0.0, 0.0),
         var name: String = "",

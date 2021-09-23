@@ -2,12 +2,19 @@ package com.raywenderlich.placebook.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.model.Bookmark
 import com.raywenderlich.placebook.repository.BookmarkRepo
 import com.raywenderlich.placebook.util.ImageUtils
+import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.decodeFileToSize
+import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.rotateImageIfRequired
+import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.saveBitmapToFile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -18,15 +25,26 @@ AndroidViewModel(application) {
 
 
     data class BookmarkDetailsView(
+
+
         var id: Long? = null,
         var name: String = "",
         var phone: String = "",
         var address: String = "",
         var notes: String = ""
-    ) {
+    )
+
+    {
+
         fun getImage(context: Context) = id?.let {
             ImageUtils.ImageUtils.loadBitmapFromFile(context,
                 Bookmark.generateImageFilename(it))
+        }
+        fun setImage(context: Context, image: Bitmap) {
+            id?.let {
+                ImageUtils.saveBitmapToFile(context, image,
+                    Bookmark.generateImageFilename(it))
+            }
         }
     }
     private fun bookmarkToBookmarkView(bookmark: Bookmark):
@@ -39,17 +57,17 @@ AndroidViewModel(application) {
             bookmark.notes
         )
     }
-    private fun mapBookmarkToBookmarkView(bookmarkId: Long) {
+    private fun mapBookmarksToBookmarkView(bookmarkId: Long) {
         val bookmark = bookmarkRepo.getLiveBookmark(bookmarkId)
         bookmarkDetailsView = Transformations.map(bookmark)
         { repoBookmark ->
             bookmarkToBookmarkView(repoBookmark)
         }
     }
-    fun getBookmark(bookmarkId: Long):
+    fun getBookmarkViews(bookmarkId: Long):
             LiveData<BookmarkDetailsView>? {
         if (bookmarkDetailsView == null) {
-            mapBookmarkToBookmarkView(bookmarkId)
+            mapBookmarksToBookmarkView(bookmarkId)
         }
         return bookmarkDetailsView
     }
@@ -76,4 +94,44 @@ AndroidViewModel(application) {
             bookmark?.let { bookmarkRepo.updateBookmark(it) }
         }
     }
+    private fun updateImage(image: Bitmap) {
+        bookmarkDetailsView?.let {
+            databinding.imageViewPlace.setImageBitmap(image)
+            it.setImage(this, image)
+        }
+    }
+    private fun getImageWithPath(filePath: String) =
+        ImageUtils.decodeFileToSize(
+            filePath,
+            resources.getDimensionPixelSize(R.dimen.default_image_width),
+            resources.getDimensionPixelSize(R.dimen.default_image_height)
+        )
+    override fun onActivityResult(requestCode: Int, resultCode: Int,
+                                  data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == android.app.Activity.RESULT_OK) {
+
+            when (requestCode) {
+
+                REQUEST_CAPTURE_IMAGE -> {
+
+                    val photoFile = photoFile ?: return
+
+                    val uri = FileProvider.getUriForFile(this,
+                        "com.raywenderlich.placebook.fileprovider",
+                        photoFile)
+                    revokeUriPermission(uri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+                    val image = getImageWithPath(photoFile.absolutePath)
+                    val bitmap = ImageUtils.rotateImageIfRequired(this,
+                        image , uri)
+                    updateImage(bitmap)
+                }
+            }
+        }
+    }
+
+
 }
