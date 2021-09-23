@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.databinding.ActivityBookmarkDetailsBinding
 import com.raywenderlich.placebook.util.ImageUtils
-import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.rotateImageIfRequired
+import com.raywenderlich.placebook.util.ImageUtils.rotateImageIfRequired
 import com.raywenderlich.placebook.viewmodel.BookmarkDetailsViewModel
 import java.io.File
 import java.io.IOException
@@ -102,7 +102,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
         photoFile = null
         try {
 
-            photoFile = ImageUtils.ImageUtils.createUniqueImageFile(this)
+            photoFile = ImageUtils.createUniqueImageFile(this)
         } catch (ex: IOException) {
 
             return

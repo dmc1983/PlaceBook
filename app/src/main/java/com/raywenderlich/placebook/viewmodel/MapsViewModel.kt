@@ -71,7 +71,7 @@ class MapsViewModel(application: Application) :
         var phone: String = ""
     ) {
         fun getImage(context: Context) = id?.let {
-            ImageUtils.ImageUtils.loadBitmapFromFile(
+            ImageUtils.loadBitmapFromFile(
                 context,
                 Bookmark.generateImageFilename(it)
             )

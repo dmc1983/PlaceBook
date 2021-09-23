@@ -24,7 +24,7 @@ data class Bookmark(
     fun setImage(image: Bitmap, context: Context) {
 
         id?.let {
-            ImageUtils.ImageUtils.saveBitmapToFile(context, image,
+            ImageUtils.saveBitmapToFile(context, image,
                 generateImageFilename(it))
         }
     }

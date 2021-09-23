@@ -37,7 +37,7 @@ AndroidViewModel(application) {
     {
 
         fun getImage(context: Context) = id?.let {
-            ImageUtils.ImageUtils.loadBitmapFromFile(context,
+            ImageUtils.loadBitmapFromFile(context,
                 Bookmark.generateImageFilename(it))
         }
         fun setImage(context: Context, image: Bitmap) {
