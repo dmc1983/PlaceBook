@@ -3,6 +3,7 @@ package com.raywenderlich.placebook.ui
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.provider.MediaStore
 import android.view.MenuItem
 import android.widget.Toast
@@ -28,6 +29,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     private var bookmarkDetailsView:
             BookmarkDetailsViewModel.BookmarkDetailsView? = null
     private var photoFile: File? = null
+
 
     override fun onCreate(savedInstanceState: android.os.Bundle?)
     {
@@ -68,6 +70,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
                 }
             })
     }
+
     override fun onCreateOptionsMenu(menu: android.view.Menu):
             Boolean {
         menuInflater.inflate(R.menu.menu_bookmark_details, menu)
@@ -132,8 +135,9 @@ class BookmarkDetailsActivity : AppCompatActivity(),
         }
     }
     override fun onPickClick() {
-        Toast.makeText(this, "Gallery Pick",
-            Toast.LENGTH_SHORT).show()
+        val pickIntent = Intent(Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(pickIntent, REQUEST_GALLERY_IMAGE)
     }
     private fun replaceImage() {
         val newFragment = PhotoOptionDialogFragment.newInstance(this)
@@ -141,6 +145,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     }
     companion object {
         private const val REQUEST_CAPTURE_IMAGE = 1
+        private const val REQUEST_GALLERY_IMAGE = 2
     }
     private fun updateImage(image: Bitmap) {
         bookmarkDetailsView?.let {
@@ -156,21 +161,31 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int,
                                   data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // 1
+
         if (resultCode == android.app.Activity.RESULT_OK) {
-            // 2
+
             when (requestCode) {
-                // 3
+                REQUEST_GALLERY_IMAGE -> if (data != null && data.data != null)
+                {
+                    val imageUri = data.data as Uri
+                    val image = getImageWithAuthority(imageUri)
+                    image?.let {
+                        val bitmap = ImageUtils.rotateImageIfRequired(this, it,
+                            imageUri)
+                        updateImage(bitmap)
+                    }
+                }
+
                 REQUEST_CAPTURE_IMAGE -> {
-                    // 4
+
                     val photoFile = photoFile ?: return
-                    // 5
+
                     val uri = FileProvider.getUriForFile(this,
                         "com.raywenderlich.placebook.fileprovider",
                         photoFile)
                     revokeUriPermission(uri,
                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    // 6
+
                     val image = getImageWithPath(photoFile.absolutePath)
                     val bitmap = ImageUtils.rotateImageIfRequired(this,
                         image , uri)
@@ -178,5 +193,12 @@ class BookmarkDetailsActivity : AppCompatActivity(),
                 }
             }
         }
+
     }
+    private fun getImageWithAuthority(uri: Uri) = ImageUtils.decodeUriStreamToSize(uri,
+            resources.getDimensionPixelSize(R.dimen.default_image_width),
+            resources.getDimensionPixelSize(R.dimen.default_image_height),
+            this
+        )
+
 }

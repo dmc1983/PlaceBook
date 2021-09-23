@@ -12,9 +12,9 @@ import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.model.Bookmark
 import com.raywenderlich.placebook.repository.BookmarkRepo
 import com.raywenderlich.placebook.util.ImageUtils
-import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.decodeFileToSize
-import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.rotateImageIfRequired
-import com.raywenderlich.placebook.util.ImageUtils.ImageUtils.saveBitmapToFile
+import com.raywenderlich.placebook.util.ImageUtils.decodeFileToSize
+import com.raywenderlich.placebook.util.ImageUtils.rotateImageIfRequired
+import com.raywenderlich.placebook.util.ImageUtils.saveBitmapToFile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -92,44 +92,6 @@ AndroidViewModel(application) {
             val bookmark = bookmarkViewToBookmark(bookmarkView)
 
             bookmark?.let { bookmarkRepo.updateBookmark(it) }
-        }
-    }
-    private fun updateImage(image: Bitmap) {
-        bookmarkDetailsView?.let {
-            databinding.imageViewPlace.setImageBitmap(image)
-            it.setImage(this, image)
-        }
-    }
-    private fun getImageWithPath(filePath: String) =
-        ImageUtils.decodeFileToSize(
-            filePath,
-            resources.getDimensionPixelSize(R.dimen.default_image_width),
-            resources.getDimensionPixelSize(R.dimen.default_image_height)
-        )
-    override fun onActivityResult(requestCode: Int, resultCode: Int,
-                                  data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == android.app.Activity.RESULT_OK) {
-
-            when (requestCode) {
-
-                REQUEST_CAPTURE_IMAGE -> {
-
-                    val photoFile = photoFile ?: return
-
-                    val uri = FileProvider.getUriForFile(this,
-                        "com.raywenderlich.placebook.fileprovider",
-                        photoFile)
-                    revokeUriPermission(uri,
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-                    val image = getImageWithPath(photoFile.absolutePath)
-                    val bitmap = ImageUtils.rotateImageIfRequired(this,
-                        image , uri)
-                    updateImage(bitmap)
-                }
-            }
         }
     }
 
