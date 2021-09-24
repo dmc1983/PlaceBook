@@ -19,29 +19,37 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class BookmarkDetailsViewModel(application: Application) :
-AndroidViewModel(application) {
+    AndroidViewModel(application) {
     private val bookmarkRepo = BookmarkRepo(getApplication())
     private var bookmarkDetailsView: LiveData<BookmarkDetailsView>? = null
 
 
-    data class BookmarkDetailsView(var id: Long? = null,
-                                   var name: String = "",
-                                   var phone: String = "",
-                                   var address: String = "",
-                                   var notes: String = "",
-                                   var category: String = "") {
+    data class BookmarkDetailsView(
+        var id: Long? = null,
+        var name: String = "",
+        var phone: String = "",
+        var address: String = "",
+        var notes: String = "",
+        var category: String = ""
+    ) {
 
         fun getImage(context: Context) = id?.let {
-            ImageUtils.loadBitmapFromFile(context,
-                Bookmark.generateImageFilename(it))
+            ImageUtils.loadBitmapFromFile(
+                context,
+                Bookmark.generateImageFilename(it)
+            )
         }
+
         fun setImage(context: Context, image: Bitmap) {
             id?.let {
-                ImageUtils.saveBitmapToFile(context, image,
-                    Bookmark.generateImageFilename(it))
+                ImageUtils.saveBitmapToFile(
+                    context, image,
+                    Bookmark.generateImageFilename(it)
+                )
             }
         }
     }
+
     private fun bookmarkToBookmarkView(bookmark: Bookmark):
             BookmarkDetailsView {
         return BookmarkDetailsView(
@@ -53,6 +61,7 @@ AndroidViewModel(application) {
             bookmark.category
         )
     }
+
     private fun mapBookmarksToBookmarkView(bookmarkId: Long) {
         val bookmark = bookmarkRepo.getLiveBookmark(bookmarkId)
         bookmarkDetailsView = Transformations.map(bookmark)
@@ -60,6 +69,7 @@ AndroidViewModel(application) {
             bookmarkToBookmarkView(repoBookmark)
         }
     }
+
     fun getBookmarkViews(bookmarkId: Long):
             LiveData<BookmarkDetailsView>? {
         if (bookmarkDetailsView == null) {
@@ -67,21 +77,23 @@ AndroidViewModel(application) {
         }
         return bookmarkDetailsView
     }
-    private fun bookmarkViewToBookmark(bookmarkView:
-                                       BookmarkDetailsView): Bookmark? {
-        val bookmark = bookmarkView.id?.let {
+
+    private fun bookmarkViewToBookmark(bookmarkDetailsView: BookmarkDetailsView):
+            Bookmark? {
+        val bookmark = bookmarkDetailsView.id?.let {
             bookmarkRepo.getBookmark(it)
         }
         if (bookmark != null) {
-            bookmark.id = bookmarkView.id
-            bookmark.name = bookmarkView.name
-            bookmark.phone = bookmarkView.phone
-            bookmark.address = bookmarkView.address
-            bookmark.notes = bookmarkView.notes
+            bookmark.id = bookmarkDetailsView.id
+            bookmark.name = bookmarkDetailsView.name
+            bookmark.phone = bookmarkDetailsView.phone
+            bookmark.address = bookmarkDetailsView.address
+            bookmark.notes = bookmarkDetailsView.notes
             bookmark.category = bookmarkDetailsView.category
         }
         return bookmark
     }
+
     fun updateBookmark(bookmarkView: BookmarkDetailsView) {
 
         GlobalScope.launch {
@@ -91,9 +103,11 @@ AndroidViewModel(application) {
             bookmark?.let { bookmarkRepo.updateBookmark(it) }
         }
     }
+
     fun getCategoryResourceId(category: String): Int? {
         return bookmarkRepo.getCategoryResourceId(category)
     }
+
     fun getCategories(): List<String> {
         return bookmarkRepo.categories
     }
