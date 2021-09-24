@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -200,5 +201,29 @@ class BookmarkDetailsActivity : AppCompatActivity(),
             resources.getDimensionPixelSize(R.dimen.default_image_height),
             this
         )
+
+    private fun populateCategoryList() {
+
+        val bookmarkView = bookmarkDetailsView ?: return
+
+        val resourceId =
+            bookmarkDetailsViewModel.getCategoryResourceId(bookmarkView.category)
+
+        resourceId?.let
+        { databinding.imageViewCategory.setImageResource(it) }
+
+        val categories = bookmarkDetailsViewModel.getCategories()
+
+        val adapter = ArrayAdapter(this,
+            android.R.layout.simple_spinner_item, categories)
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        databinding.spinnerCategory.adapter = adapter
+
+        val placeCategory = bookmarkView.category
+
+        databinding.spinnerCategory.setSelection(adapter.getPosition(placeCategory))
+    }
 
 }

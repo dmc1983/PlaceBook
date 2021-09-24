@@ -24,17 +24,12 @@ AndroidViewModel(application) {
     private var bookmarkDetailsView: LiveData<BookmarkDetailsView>? = null
 
 
-    data class BookmarkDetailsView(
-
-
-        var id: Long? = null,
-        var name: String = "",
-        var phone: String = "",
-        var address: String = "",
-        var notes: String = ""
-    )
-
-    {
+    data class BookmarkDetailsView(var id: Long? = null,
+                                   var name: String = "",
+                                   var phone: String = "",
+                                   var address: String = "",
+                                   var notes: String = "",
+                                   var category: String = "") {
 
         fun getImage(context: Context) = id?.let {
             ImageUtils.loadBitmapFromFile(context,
@@ -54,7 +49,8 @@ AndroidViewModel(application) {
             bookmark.name,
             bookmark.phone,
             bookmark.address,
-            bookmark.notes
+            bookmark.notes,
+            bookmark.category
         )
     }
     private fun mapBookmarksToBookmarkView(bookmarkId: Long) {
@@ -82,6 +78,7 @@ AndroidViewModel(application) {
             bookmark.phone = bookmarkView.phone
             bookmark.address = bookmarkView.address
             bookmark.notes = bookmarkView.notes
+            bookmark.category = bookmarkDetailsView.category
         }
         return bookmark
     }
@@ -93,6 +90,12 @@ AndroidViewModel(application) {
 
             bookmark?.let { bookmarkRepo.updateBookmark(it) }
         }
+    }
+    fun getCategoryResourceId(category: String): Int? {
+        return bookmarkRepo.getCategoryResourceId(category)
+    }
+    fun getCategories(): List<String> {
+        return bookmarkRepo.categories
     }
 
 

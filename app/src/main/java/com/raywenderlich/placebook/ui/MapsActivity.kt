@@ -102,13 +102,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                        PointOfInterest) {
         val placeId = pointOfInterest.placeId
 
-        val placeFields = listOf(
-            Place.Field.ID,
+        val placeFields = listOf(Place.Field.ID,
             Place.Field.NAME,
             Place.Field.PHONE_NUMBER,
             Place.Field.PHOTO_METADATAS,
             Place.Field.ADDRESS,
-            Place.Field.LAT_LNG)
+            Place.Field.LAT_LNG,
+            Place.Field.TYPES)
 
         val request = FetchPlaceRequest
             .builder(placeId, placeFields)
@@ -244,8 +244,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .position(bookmark.location)
             .title(bookmark.name)
             .snippet(bookmark.phone)
-            .icon(BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_AZURE))
+            .icon(bookmark.categoryResourceId?.let {
+                BitmapDescriptorFactory.fromResource(it)
+            })
             .alpha(0.8f))
         marker.tag = bookmark
         bookmark.id?.let { markers.put(it, marker) }
