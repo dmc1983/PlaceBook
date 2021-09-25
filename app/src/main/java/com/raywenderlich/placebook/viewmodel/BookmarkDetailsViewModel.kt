@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -17,6 +18,7 @@ import com.raywenderlich.placebook.util.ImageUtils.rotateImageIfRequired
 import com.raywenderlich.placebook.util.ImageUtils.saveBitmapToFile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 class BookmarkDetailsViewModel(application: Application) :
     AndroidViewModel(application) {
@@ -30,7 +32,10 @@ class BookmarkDetailsViewModel(application: Application) :
         var phone: String = "",
         var address: String = "",
         var notes: String = "",
-        var category: String = ""
+        var category: String = "",
+        var longitude: Double = 0.0,
+        var latitude: Double = 0.0,
+        var placeId: String? = null
     ) {
 
         fun getImage(context: Context) = id?.let {
@@ -58,7 +63,10 @@ class BookmarkDetailsViewModel(application: Application) :
             bookmark.phone,
             bookmark.address,
             bookmark.notes,
-            bookmark.category
+            bookmark.category,
+            bookmark.longitude,
+            bookmark.latitude,
+            bookmark.placeId
         )
     }
 
@@ -66,7 +74,9 @@ class BookmarkDetailsViewModel(application: Application) :
         val bookmark = bookmarkRepo.getLiveBookmark(bookmarkId)
         bookmarkDetailsView = Transformations.map(bookmark)
         { repoBookmark ->
-            bookmarkToBookmarkView(repoBookmark)
+            repoBookmark?.let { repoBookmark ->
+                bookmarkToBookmarkView(repoBookmark)
+            }
         }
     }
 
@@ -111,6 +121,17 @@ class BookmarkDetailsViewModel(application: Application) :
     fun getCategories(): List<String> {
         return bookmarkRepo.categories
     }
+    fun deleteBookmark(bookmarkDetailsView: BookmarkDetailsView) {
+        GlobalScope.launch {
+            val bookmark = bookmarkDetailsView.id?.let {
+                bookmarkRepo.getBookmark(it)
+            }
+            bookmark?.let {
+                bookmarkRepo.deleteBookmark(it)
+            }
+        }
+    }
+
 
 
 }
