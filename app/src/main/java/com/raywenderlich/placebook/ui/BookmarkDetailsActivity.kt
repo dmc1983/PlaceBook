@@ -297,7 +297,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
 
         sendIntent.type = "text/plain"
 
-        ContextCompat.startActivity(sendIntent)
+        startActivity(sendIntent)
     }
     private fun setupFab() {
         databinding.fab.setOnClickListener { sharePlace() }

@@ -7,8 +7,8 @@
   <string name="address">Address</string>
   <string name="phone">Phone</string>
   <string name="phone_number">Phone number</string>
-  <string name="notes">Notes</string>
-  <string name="enter_notes">Enter notes</string>
+  <string name="notes"></string>
+  <string name="enter_notes"></string>
   <string name="open_drawer">Open Drawer</string>
   <string name="close_drawer">Close Drawer</string>
   <string name="category">Category</string>
